@@ -4,7 +4,6 @@
 
 [build.environment]
   JEKYLL_ENV = "production"
-  NPM_FLAGS = "--no-optional"
 
 # Redirect and rewrite rules
 [[redirects]]
@@ -33,13 +32,15 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     
-# Cache plugin configuration
+# Cache settings
+[build.environment]
+  NPM_FLAGS = "--no-optional"
+
 [[plugins]]
   package = "netlify-plugin-cache"
-  
-  [plugins.inputs]
-    paths = [
-      "node_modules/.cache",
-      ".sass-cache",
-      ".jekyll-cache"
-    ] 
+    [plugins.inputs]
+      paths = [
+        "node_modules/.cache",
+        ".sass-cache",
+        ".jekyll-cache"
+      ] 

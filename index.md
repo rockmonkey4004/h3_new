@@ -115,3 +115,13 @@ keywords: health, healing, hope, paleo recipes, gluten-free, sugar-free, wellnes
 	</form>
 </section>
 </section>
+
+# Redirects for Netlify
+# Redirect default Netlify subdomain to primary domain
+https://h3-with-laura.netlify.app/* https://h3withlaura.com/:splat 301!
+
+# Handle old URLs if any exist
+# Example: /old-page /new-page 301
+
+# Handle 404s
+/* /404.html 404
