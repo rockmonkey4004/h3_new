@@ -12,15 +12,15 @@
 
 	{% if page.layout == "default" %}
 	<!-- Banner -->
-	<section id="banner" class="modern-banner">
-		<div class="banner-content">
-			<h2>{{ site.title }}</h2>
-			<p class="banner-description">{{ site.description }}</p>
-			<div class="banner-actions">
-				<a href="{{ site.baseurl | prepend: site.url }}/aboutme" class="button special">About Me</a>
-				<a href="{{ site.baseurl | prepend: site.url }}/blog" class="button">Explore Blog</a>
-			</div>
-		</div>
+	<section id="banner">
+		<h2>{{ site.title }}</h2>
+		<p>{{ site.description }}</p>
+		<ul class="actions">
+			<li><a href="{{ site.baseurl | prepend: site.url }}/aboutme" class="button special">About Me</a></li>
+			<li><a href="{{ site.baseurl | prepend: site.url }}/blog" class="button">Blog</a></li>
+
+
+		</ul>
 	</section>
 	{% else %}
 	<!-- Main -->

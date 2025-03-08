@@ -1,34 +1,43 @@
-<nav id="nav" class="modern-nav">
-	<ul class="main-nav">
+<nav id="nav">
+
+	<ul>
+
+		<!--	<li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li> -->
+		<li><a href="https://www.facebook.com/h3withlaura" class="icon fa-facebook"><span class="label">Facebook</span></a></li>
+		<li><a href="https://www.instagram.com/lauramsanders/" class="icon fa-instagram"><span class="label">Instagram</span></a></li>
+		<!-- <li><a href="#" class="icon fa-github"><span class="label">Github</span></a></li>
+			<li><a href="#" class="icon fa-dribbble"><span class="label">Dribbble</span></a></li>
+			<li><a href="#" class="icon fa-google-plus"><span class="label">Google+</span></a></li> -->
+
+
 		<li><a href="{{ site.baseurl | prepend: site.url }}">Home</a></li>
-		<li><a href="{{ site.baseurl | prepend: site.url }}/aboutme">About</a></li>
-		<li><a href="{{ site.baseurl | prepend: site.url }}/blog">Blog</a></li>
-		<li class="has-dropdown">
-			<a href="{{ site.baseurl | prepend: site.url }}/tag/recipes">Recipes</a>
-			<ul class="dropdown">
-				<li><a href="{{ site.baseurl | prepend: site.url }}/tag/recipes">All Recipes</a></li>
-				<li><a href="{{ site.baseurl | prepend: site.url }}/tag/favorite-recipes">My Favorites</a></li>
-				<li><a href="{{ site.baseurl | prepend: site.url }}/tag/desserts">Desserts</a></li>
-				<li><a href="{{ site.baseurl | prepend: site.url }}/tag/gluten-free">Gluten Free</a></li>
-				<li><a href="{{ site.baseurl | prepend: site.url }}/tag/paleo">Paleo</a></li>
+		<li><a href="{{ site.baseurl | prepend: site.url }}/christmas">Christmas Treats E-Book</a></li>
+
+		<li>
+			<a href="#" class="icon fa-angle-down">Menu</a>
+			<ul>
+				<li><a href="{{ site.baseurl | prepend: site.url }}/aboutme">About Me</a></li>
+				<li><a href="{{ site.baseurl | prepend: site.url }}/blog">Blog</a></li>
+				<li><a href="{{ site.baseurl | prepend: site.url }}/recommended-items">Recommended Items</a></li>
+				<li><a href="{{ site.baseurl | prepend: site.url }}/tag/topic-tuesday">Topic Tuesday Posts</a></li>
+				<li><a href="{{ site.baseurl | prepend: site.url }}/tag/tip-thursday">Tip Thursday Posts</a></li>
+
+
+				<li>
+
+
+					<a href="#" class="icon">Recipes</a>
+					<ul>
+						<li><a href="{{ site.baseurl | prepend: site.url }}/tag/recipes">All</a></li>
+						<li><a href="{{ site.baseurl | prepend: site.url }}/tag/favorite-recipes">My Favorites</a></li>
+						<li><a href="{{ site.baseurl | prepend: site.url }}/tag/desserts">Desserts</a></li>
+						<li><a href="{{ site.baseurl | prepend: site.url }}/tag/gluten-free">Gluten Free</a></li>
+						<li><a href="{{ site.baseurl | prepend: site.url }}/tag/paleo">Paleo</a></li>
+						<!-- <li><a href="{{ site.baseurl | prepend: site.url }}/tag/whole-30" class="icon">Whole 30</a></li> -->
+					</ul>
+				</li>
 			</ul>
 		</li>
-		<li><a href="{{ site.baseurl | prepend: site.url }}/christmas" class="highlight">Christmas E-Book</a></li>
-		<li><a href="{{ site.baseurl | prepend: site.url }}/recommended-items">Resources</a></li>
-	</ul>
-	
-	<ul class="nav-actions">
-		<li><a href="{{ site.baseurl | prepend: site.url }}/search" class="search-icon" aria-label="Search"><i class="fas fa-search"></i></a></li>
-		<li class="social-icons">
-			<a href="https://www.instagram.com/lauramsanders/" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-			<a href="https://www.facebook.com/h3withlaura" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-		</li>
-		<li class="mobile-menu-toggle">
-			<button class="hamburger" aria-label="Menu">
-				<span></span>
-				<span></span>
-				<span></span>
-			</button>
-		</li>
+		 <li><a href="{{ site.baseurl | prepend: site.url }}/search" class="icon fas fa-search"><span class="label">Search</span></a></li>
 	</ul>
 </nav>

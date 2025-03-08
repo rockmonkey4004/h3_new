@@ -1,71 +1,27 @@
 <!-- Footer -->
-<footer id="footer" class="modern-footer">
-	<div class="footer-container">
-		<div class="footer-section about-section">
-			<div class="footer-logo">
-				<h3>{{ site.title }}</h3>
-			</div>
-			<p class="footer-description">{{ site.description }}</p>
-			<div class="social-links" itemscope itemtype="https://schema.org/Organization">
-				<meta itemprop="name" content="{{ site.title }}">
-				<link itemprop="url" href="{{ site.url }}{{ site.baseurl }}">
-				{% if site.facebook_URL %}
-				<a href="{{ site.facebook_URL }}" class="social-icon" itemprop="sameAs" rel="me noopener" target="_blank" aria-label="Facebook">
-					<i class="fab fa-facebook-f"></i>
-				</a>
-				{% endif %}
-				{% if site.instagram_username %}
-				<a href="https://instagram.com/{{ site.instagram_username }}" class="social-icon" itemprop="sameAs" rel="me noopener" target="_blank" aria-label="Instagram">
-					<i class="fab fa-instagram"></i>
-				</a>
-				{% endif %}
-				{% if site.github_username %}
-				<a href="https://github.com/{{ site.github_username }}" class="social-icon" itemprop="sameAs" rel="me noopener" target="_blank" aria-label="GitHub">
-					<i class="fab fa-github"></i>
-				</a>
-				{% endif %}
-				<a href="{{ '/feed.xml' | relative_url }}" class="social-icon" aria-label="RSS Feed">
-					<i class="fas fa-rss"></i>
-				</a>
-			</div>
-		</div>
-		
-		<div class="footer-section links-section">
-			<h4>Quick Links</h4>
-			<ul class="footer-links">
-				<li><a href="{{ site.baseurl | prepend: site.url }}">Home</a></li>
-				<li><a href="{{ site.baseurl | prepend: site.url }}/aboutme">About</a></li>
-				<li><a href="{{ site.baseurl | prepend: site.url }}/blog">Blog</a></li>
-				<li><a href="{{ site.baseurl | prepend: site.url }}/tag/recipes">Recipes</a></li>
-				<li><a href="{{ site.baseurl | prepend: site.url }}/recommended-items">Resources</a></li>
-			</ul>
-		</div>
-		
-		<div class="footer-section subscribe-section">
-			<h4>Stay Updated</h4>
-			<p>Subscribe to receive the latest recipes and wellness tips.</p>
-			<form class="footer-form">
-				<input type="email" placeholder="Your email address" required>
-				<button type="submit" class="subscribe-btn">Subscribe</button>
-			</form>
-			<div class="support-link">
-				<a href="http://buymeacoffee.com/h3withlaura" rel="nofollow noopener" target="_blank">
-					<i class="fas fa-mug-hot"></i> Support My Work
-				</a>
-			</div>
-		</div>
+<footer id="footer">
+	<div itemscope itemtype="https://schema.org/Organization">
+		<meta itemprop="name" content="{{ site.title }}">
+		<link itemprop="url" href="{{ site.url }}{{ site.baseurl }}">
+		<ul class="icons">
+			{% if site.facebook_URL %}
+			<li><a href="{{ site.facebook_URL }}" class="icon brands fa-facebook-f" itemprop="sameAs" rel="me noopener" target="_blank" aria-label="Facebook"><span class="label">Facebook</span></a></li>
+			{% endif %}
+			{% if site.instagram_username %}
+			<li><a href="https://instagram.com/{{ site.instagram_username }}" class="icon brands fa-instagram" itemprop="sameAs" rel="me noopener" target="_blank" aria-label="Instagram"><span class="label">Instagram</span></a></li>
+			{% endif %}
+			{% if site.github_username %}
+			<li><a href="https://github.com/{{ site.github_username }}" class="icon brands fa-github" itemprop="sameAs" rel="me noopener" target="_blank" aria-label="GitHub"><span class="label">GitHub</span></a></li>
+			{% endif %}
+			<li><a href="{{ '/feed.xml' | relative_url }}" class="icon solid fa-rss" aria-label="RSS Feed"><span class="label">RSS</span></a></li>
+		</ul>
 	</div>
 	
-	<div class="footer-bottom">
-		<div class="copyright">
-			<p>&copy; {{ site.time | date: '%Y' }} {{ site.title }}. All rights reserved.</p>
-		</div>
-		<div class="footer-meta">
-			<a href="{{ '/sitemap.xml' | relative_url }}" rel="nofollow">Sitemap</a>
-			<span class="separator">|</span>
-			<a href="{{ site.baseurl | prepend: site.url }}/search">Search</a>
-		</div>
-	</div>
+	<ul class="copyright">
+		<li>&copy; {{ site.time | date: '%Y' }} {{ site.title }}. All rights reserved.</li>
+		<li><a href="{{ '/sitemap.xml' | relative_url }}" rel="nofollow">Sitemap</a></li>
+		<li><a href="http://buymeacoffee.com/h3withlaura" rel="nofollow noopener" target="_blank">Support Me</a></li>
+	</ul>
 	
 	<!-- Structured data for the website - important for SEO -->
 	<script type="application/ld+json">
