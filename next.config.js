@@ -18,6 +18,7 @@ const nextConfig = {
   images: {
     domains: ['res.cloudinary.com'],
     formats: ['image/avif', 'image/webp'],
+    unoptimized: process.env.NODE_ENV === 'development',
   },
   // If you're using Netlify, this helps with redirects
   async redirects() {
@@ -30,8 +31,13 @@ const nextConfig = {
       },
     ];
   },
-  // To ensure better compatibility with Netlify
-  target: 'serverless',
+  // Ensure Next.js can run on serverless functions
+  output: 'standalone',
+  // Disable experimental features that might cause issues
+  experimental: {
+    legacyBrowsers: true,
+    browsersListForSwc: true,
+  }
 };
 
 module.exports = withMDX(nextConfig); 
