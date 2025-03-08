@@ -2,7 +2,10 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { getAllTags } from '../../lib/mdx';
 
-export default function TopicsPage({ tags }) {
+export default function TopicsPage({ tags = [] }) {
+  // Ensure tags is an array
+  const tagsArray = Array.isArray(tags) ? tags : [];
+  
   return (
     <>
       <Head>
@@ -17,17 +20,25 @@ export default function TopicsPage({ tags }) {
           Browse all topics to find exactly what you're looking for
         </p>
         
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {tags.map((tag) => (
-            <Link
-              key={tag}
-              href={`/topics/${tag}`}
-              className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow text-center"
-            >
-              <span className="text-lg font-medium text-accent-dark">{tag}</span>
-            </Link>
-          ))}
-        </div>
+        {tagsArray.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {tagsArray.map((tag) => (
+              <Link
+                key={tag}
+                href={`/topics/${tag}`}
+                className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow text-center"
+              >
+                <span className="text-lg font-medium text-accent-dark">{tag}</span>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-600">
+              No topics found. Check back later!
+            </p>
+          </div>
+        )}
       </div>
     </>
   );
@@ -36,9 +47,12 @@ export default function TopicsPage({ tags }) {
 export async function getStaticProps() {
   const tags = getAllTags();
   
+  // Ensure tags is an array
+  const tagsArray = Array.isArray(tags) ? tags : [];
+  
   return {
     props: {
-      tags,
+      tags: tagsArray,
     },
   };
 } 

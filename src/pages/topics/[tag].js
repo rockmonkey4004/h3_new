@@ -2,7 +2,10 @@ import Head from 'next/head';
 import PostCard from '../../components/blog/PostCard';
 import { getAllTags, getPostsByTag } from '../../lib/mdx';
 
-export default function TopicPage({ tag, posts }) {
+export default function TopicPage({ tag = '', posts = [] }) {
+  // Ensure posts is an array
+  const postsArray = Array.isArray(posts) ? posts : [];
+  
   return (
     <>
       <Head>
@@ -14,12 +17,12 @@ export default function TopicPage({ tag, posts }) {
         <h1 className="text-4xl font-bold mb-4 text-center capitalize">{tag}</h1>
         
         <p className="text-lg text-gray-600 mb-12 text-center">
-          Showing {posts.length} posts tagged with "{tag}"
+          Showing {postsArray.length} posts tagged with "{tag}"
         </p>
         
-        {posts.length > 0 ? (
+        {postsArray.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {posts.map((post) => (
+            {postsArray.map((post) => (
               <PostCard key={post.slug} post={post} />
             ))}
           </div>
@@ -39,7 +42,10 @@ export default function TopicPage({ tag, posts }) {
 export async function getStaticPaths() {
   const tags = getAllTags();
   
-  const paths = tags.map((tag) => ({
+  // Ensure tags is an array
+  const tagsArray = Array.isArray(tags) ? tags : [];
+  
+  const paths = tagsArray.map((tag) => ({
     params: { tag },
   }));
   
@@ -50,13 +56,16 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  const { tag } = params;
-  const posts = getPostsByTag(tag);
+  const { tag } = params || {};
+  const posts = getPostsByTag(tag || '');
+  
+  // Ensure posts is an array
+  const postsArray = Array.isArray(posts) ? posts : [];
   
   return {
     props: {
-      tag,
-      posts,
+      tag: tag || '',
+      posts: postsArray,
     },
   };
 } 

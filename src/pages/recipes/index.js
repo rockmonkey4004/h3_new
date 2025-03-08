@@ -3,13 +3,25 @@ import { useState } from 'react';
 import PostCard from '../../components/blog/PostCard';
 import { getAllPosts } from '../../lib/mdx';
 
-export default function RecipesPage({ posts }) {
+export default function RecipesPage({ posts = [] }) {
   const [searchTerm, setSearchTerm] = useState('');
   
+  // Ensure posts is an array before filtering
+  const postsArray = Array.isArray(posts) ? posts : [];
+  
   // Filter posts based on search term
-  const filteredPosts = posts.filter(post => {
-    const { title, description, tags } = post.frontmatter;
-    const searchContent = `${title} ${description} ${tags?.join(' ') || ''}`.toLowerCase();
+  const filteredPosts = postsArray.filter(post => {
+    const { title = '', description = '', tags } = post.frontmatter || {};
+    
+    // Handle tags that might be a string or an array
+    let tagsString = '';
+    if (Array.isArray(tags)) {
+      tagsString = tags.join(' ');
+    } else if (typeof tags === 'string') {
+      tagsString = tags;
+    }
+    
+    const searchContent = `${title} ${description} ${tagsString}`.toLowerCase();
     return searchContent.includes(searchTerm.toLowerCase());
   });
 
@@ -58,13 +70,29 @@ export default function RecipesPage({ posts }) {
 }
 
 export async function getStaticProps() {
-  const posts = getAllPosts().filter(post => {
-    // Only get posts that are recipes (you might want to adjust this logic based on your content)
+  const allPosts = getAllPosts();
+  
+  // Ensure allPosts is an array
+  const postsArray = Array.isArray(allPosts) ? allPosts : [];
+  
+  const posts = postsArray.filter(post => {
+    if (!post || !post.frontmatter) return false;
+    
+    // Handle categories that might be strings or arrays
     const categories = post.frontmatter.categories || [];
+    const categoriesArray = Array.isArray(categories) ? categories : 
+                           (typeof categories === 'string' ? [categories] : []);
+    
+    // Handle tags that might be strings or arrays
     const tags = post.frontmatter.tags || [];
-    return categories.includes('recipe') || categories.includes('recipes') || 
-           tags.includes('recipes') || tags.includes('paleo') || 
-           post.frontmatter.title?.toLowerCase().includes('recipe');
+    const tagsArray = Array.isArray(tags) ? tags : 
+                     (typeof tags === 'string' ? [tags] : []);
+    
+    const title = post.frontmatter.title || '';
+    
+    return categoriesArray.includes('recipe') || categoriesArray.includes('recipes') || 
+           tagsArray.includes('recipes') || tagsArray.includes('paleo') || 
+           title.toLowerCase().includes('recipe');
   });
 
   return {
