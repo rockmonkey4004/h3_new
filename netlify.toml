@@ -1,0 +1,46 @@
+[build]
+  command = "jekyll build"
+  publish = "_site"
+
+[build.environment]
+  JEKYLL_ENV = "production"
+
+# Redirect and rewrite rules
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
+
+# Asset optimization
+[build.processing]
+  skip_processing = false
+[build.processing.css]
+  bundle = true
+  minify = true
+[build.processing.js]
+  bundle = true
+  minify = true
+[build.processing.images]
+  compress = true
+
+# Headers to set
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+# Cache settings
+[build.environment]
+  NPM_FLAGS = "--no-optional"
+
+[[plugins]]
+  package = "netlify-plugin-cache"
+    [plugins.inputs]
+      paths = [
+        "node_modules/.cache",
+        ".sass-cache",
+        ".jekyll-cache"
+      ] 
