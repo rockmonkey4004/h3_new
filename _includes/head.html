@@ -6,25 +6,24 @@
 	{% include collecttags.html %}
 	{% endif %}
 
-	<!-- Global site tag (gtag.js) - Google Analytics -->
-	<script async src=" https://www.googletagmanager.com/gtag/js?id=UA-163356748-1"> </script>
-	<script>
-		window.dataLayer = window.dataLayer || [];
+	<!-- Google Analytics 4 (GA4) -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-CJZCQWFC20"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-		function gtag() {
-			dataLayer.push(arguments);
-		}
-		gtag('js', new Date());
+  gtag('config', 'G-CJZCQWFC20');
+</script>
 
-		gtag('config', 'UA-163356748-1');
-	</script>
 	<title>{% if page.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
 	<meta name="title" content="{% if page.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}">
 	<meta name="description" content="{% if page.description %}{{ page.description | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
-	{% if site.seo.keywords %}<meta name="keywords" content="{{ site.seo.keywords | strip_html | strip_newlines }}">{% endif %}
+	{% if site.seo.keywords or page.keywords %}<meta name="keywords" content="{% if page.keywords %}{{ page.keywords | strip_html | strip_newlines }}{% else %}{{ site.seo.keywords | strip_html | strip_newlines }}{% endif %}">{% endif %}
 	<meta name="author" content="{% if page.author %}{{ page.author }}{% else %}{{ site.author }}{% endif %}">
 	<link rel="canonical" href="{{ page.url | replace:'index.html','' | absolute_url }}">
 	<meta property="og:type" content="{% if page.layout == 'post' %}article{% else %}website{% endif %}">
@@ -40,26 +39,42 @@
 	<meta property="twitter:image" content="{% if page.image %}{{ page.image | absolute_url }}{% else %}{{ site.defaults[0].values.image | absolute_url }}{% endif %}">
 	<script type="application/ld+json">
 	{
-	  "@context": "https://schema.org",
-	  "@type": "{% if page.layout == 'post' %}{{ site.schema.type }}{% else %}WebSite{% endif %}",
-	  "headline": "{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}",
-	  "image": "{% if page.image %}{{ page.image | absolute_url }}{% else %}{{ site.defaults[0].values.image | absolute_url }}{% endif %}",
-	  "author": {
-		"@type": "Person",
-		"name": "{% if page.author %}{{ page.author }}{% else %}{{ site.author }}{% endif %}"
-	  },
-	  "publisher": {
-		"@type": "Organization",
-		"name": "{{ site.schema.publisher.name }}",
-		"logo": {
-		  "@type": "ImageObject",
-		  "url": "{{ site.schema.publisher.logo.url | absolute_url }}"
+		"@context": "https://schema.org",
+		{% if page.layout == 'post' %}
+		"@type": "BlogPosting",
+		"headline": "{{ page.title }}",
+		"datePublished": "{{ page.date | date_to_xmlschema }}",
+		{% if page.last_modified_at %}
+		"dateModified": "{{ page.last_modified_at | date_to_xmlschema }}",
+		{% else %}
+		"dateModified": "{{ page.date | date_to_xmlschema }}",
+		{% endif %}
+		"author": {
+			"@type": "Person",
+			"name": "{{ site.schema.author.name }}"
+		},
+		{% if page.image %}
+		"image": "{{ page.image | absolute_url }}",
+		{% endif %}
+		"description": "{% if page.description %}{{ page.description | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}",
+		"mainEntityOfPage": {
+			"@type": "WebPage",
+			"@id": "{{ page.url | replace:'index.html','' | absolute_url }}"
+		},
+		{% else %}
+		"@type": "WebSite",
+		"name": "{{ site.title }}",
+		"url": "{{ site.url }}",
+		"description": "{{ site.description }}",
+		{% endif %}
+		"publisher": {
+			"@type": "Organization",
+			"name": "{{ site.schema.publisher.name }}",
+			"logo": {
+				"@type": "ImageObject",
+				"url": "{{ site.schema.publisher.logo.url }}"
+			}
 		}
-	  },
-	  "url": "{{ page.url | replace:'index.html','' | absolute_url }}",
-	  "description": "{% if page.description %}{{ page.description | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}"{% if page.layout == 'post' %},
-	  "datePublished": "{{ page.date | date_to_xmlschema }}",
-	  "dateModified": "{% if page.last_modified_at %}{{ page.last_modified_at | date_to_xmlschema }}{% else %}{{ page.date | date_to_xmlschema }}{% endif %}"{% endif %}
 	}
 	</script>
 	<link rel="apple-touch-icon" sizes="180x180" href="{{ '/assets/images/apple-touch-icon.png' | relative_url }}">
@@ -96,4 +111,8 @@
 <script data-name="BMC-Widget" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="h3withlaura" data-description="Support me on Buy me a coffee!" data-message="Thank you for visiting. Feel free to donate a coffee if you find value in the content!" data-color="#f0f0f0" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
 
 	{% seo %}
+
+	<!-- Preload critical resources -->
+	<link rel="preload" href="{{ '/assets/css/main.css' | relative_url }}" as="style">
+	<link rel="preload" href="{{ '/assets/js/jquery.min.js' | relative_url }}" as="script">
 </head>

@@ -1,14 +1,14 @@
 <!DOCTYPE HTML>
 <!--
-	Alpha by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+	Health, Healing, and Hope (H3) with Laura
+	Based on Alpha by HTML5 UP (html5up.net | @ajlkn)
 -->
 <html>
 	<head>
-		<title>Contact - Alpha by HTML5 UP</title>
+		<title>Contact - Health, Healing, and Hope (H3)</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content="Contact Laura Sanders at Health, Healing, and Hope (H3) for questions about health, recipes, or collaboration opportunities." />
 		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
@@ -18,28 +18,19 @@
 
 			<!-- Header -->
 				<header id="header">
-					<h1><a href="index.html">Alpha</a> by HTML5 UP</h1>
+					<h1><a href="index.html">H3</a> with Laura</h1>
 					<nav id="nav">
 						<ul>
 							<li><a href="index.html">Home</a></li>
 							<li>
-								<a href="#" class="icon fa-angle-down">Layouts</a>
+								<a href="#" class="icon fa-angle-down">Menu</a>
 								<ul>
-									<li><a href="generic.html">Generic</a></li>
+									<li><a href="/blog">Blog</a></li>
+									<li><a href="/aboutme">About Me</a></li>
 									<li><a href="contact.html">Contact</a></li>
-									<li><a href="elements.html">Elements</a></li>
-									<li>
-										<a href="#">Submenu</a>
-										<ul>
-											<li><a href="#">Option One</a></li>
-											<li><a href="#">Option Two</a></li>
-											<li><a href="#">Option Three</a></li>
-											<li><a href="#">Option Four</a></li>
-										</ul>
-									</li>
+									<li><a href="/recommended-items">Recommended Items</a></li>
 								</ul>
 							</li>
-							<li><a href="#" class="button">Sign Up</a></li>
 						</ul>
 					</nav>
 				</header>
@@ -47,8 +38,8 @@
 			<!-- Main -->
 				<section id="main" class="container 75%">
 					<header>
-						<h2>Contact Us</h2>
-						<p>Tell us what you think about our little operation.</p>
+						<h2>Contact Me</h2>
+						<p>Questions about recipes, health tips, or collaboration opportunities? I'd love to hear from you!</p>
 					</header>
 					<div class="box">
 						<form method="post" action="#">
@@ -84,15 +75,12 @@
 			<!-- Footer -->
 				<footer id="footer">
 					<ul class="icons">
-						<li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
-						<li><a href="#" class="icon fa-facebook"><span class="label">Facebook</span></a></li>
-						<li><a href="#" class="icon fa-instagram"><span class="label">Instagram</span></a></li>
-						<li><a href="#" class="icon fa-github"><span class="label">Github</span></a></li>
-						<li><a href="#" class="icon fa-dribbble"><span class="label">Dribbble</span></a></li>
-						<li><a href="#" class="icon fa-google-plus"><span class="label">Google+</span></a></li>
+						<li><a href="{{ site.facebook_URL }}" class="icon fa-facebook"><span class="label">Facebook</span></a></li>
+						<li><a href="https://www.instagram.com/{{ site.instagram_username }}" class="icon fa-instagram"><span class="label">Instagram</span></a></li>
+						<li><a href="mailto:{{ site.email }}" class="icon fa-envelope"><span class="label">Email</span></a></li>
 					</ul>
 					<ul class="copyright">
-						<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+						<li>&copy; {{ 'now' | date: "%Y" }} Health, Healing, and Hope (H3). All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
 					</ul>
 				</footer>
 
