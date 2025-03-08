@@ -26,8 +26,6 @@ url: "https://h3withlaura.com"
 # baseurl: "/rockmonkey4004" # the subpath of your site, e.g. /blog
 # url: "https://h3withlaura.com" # the base hostname & protocol for your site
 
-github: [metadata]
-
 # Author and social settings - enhanced for better SEO
 social:
   name: Laura Sanders
@@ -80,7 +78,7 @@ schema:
 #
 # for me, this line reads:
 # https://staticman-travisdownsio.herokuapp.com/v2/entry/travisdowns/travisdowns.github.io/master/comments
-staticman_url: https://h3withlaura.herokuapp.com/v2/entry/rockmonkey4004/rockmonkey4004.github.io/master/comments
+staticman_url: https://h3withlaura.herokuapp.com/v2/entry/rockmonkey4004/rockmonkey4004.github.io/main/comments
 
 reCaptcha:
   siteKey: 6LffZOcUAAAAAPuQDgsqg9V1vJQMcK9vaoA6ksXN
@@ -118,56 +116,39 @@ algolia:
 # Site configuration for the Jekyll 3 Pagination Gem
 # The values here represent the defaults if nothing is set
 pagination:
-
   # Site-wide kill switch, disabled here it doesn't run at all
   enabled: true
-
   # Set to 'true' to enable pagination debugging. This can be enabled in the site config or only for individual pagination pages
   debug: false
-
   # The default document collection to paginate if nothing is specified ('posts' is default)
   collection: 'posts'
-
   # How many objects per paginated page, used to be `paginate` (default: 0, means all)
   per_page: 10
-
   # The permalink structure for the paginated pages (this can be any level deep)
   permalink: '/page/:num/' # Pages are index.html inside this folder (default)
-  #permalink: '/page/:num.html' # Pages are simple html files
-  #permalink: '/page/:num' # Pages are html files, linked jekyll extensionless permalink style.
-
   # Optional the title format for the paginated pages (supports :title for original page title, :num for pagination page number, :max for total number of pages)
   title: ':title - page :num'
-
   # Limit how many pagenated pages to create (default: 0, means all)
   limit: 0
-
   # Optional, defines the field that the posts should be sorted on (omit to default to 'date')
   sort_field: 'date'
-
   # Optional, sorts the posts in reverse order (omit to default decending or sort_reverse: true)
   sort_reverse: true
-
   # Optional, the default category to use, omit or just leave this as 'posts' to get a backwards-compatible behavior (all posts)
   category: 'posts'
-
   # Optional, the default tag to use, omit to disable
   tag: ''
-
   # Optional, the default locale to use, omit to disable (depends on a field 'locale' to be specified in the posts,
   # in reality this can be any value, suggested are the Microsoft locale-codes (e.g. en_US, en_GB) or simply the ISO-639 language code )
   locale: 'en_US'
-
- # Optional,omit or set both before and after to zero to disable.
- # Controls how the pagination trail for the paginated pages look like.
+  # Optional,omit or set both before and after to zero to disable.
+  # Controls how the pagination trail for the paginated pages look like.
   trail:
     before: 2
     after: 2
-
   # Optional, the default file extension for generated pages (e.g html, json, xml).
   # Internally this is set to html by default
   extension: html
-
   # Optional, the default name of the index file for generated pages (e.g. 'index.html')
   # Without file extension
   indexpage: 'index'
@@ -200,6 +181,7 @@ jekyll-minifier:
   preserve_patterns:                # Default: (empty)
   uglifier_args:                    # Default: (empty)
 
+# Jekyll 4.x uses a different plugins configuration approach
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
@@ -207,6 +189,13 @@ plugins:
   - jekyll-paginate-v2
   - jekyll-last-modified-at
   - jekyll-minifier
+  - jekyll_picture_tag
+  - jekyll-algolia
 
-# Google Analytics - Add your ID here if you have one
-# google_analytics: UA-XXXXXXXX-X
+# Add SASS configuration for Jekyll 4
+sass:
+  style: compressed
+  sourcemap: never
+
+# Modern Google Analytics - Update to GA4 configuration
+# google_analytics_ga4: G-XXXXXXXXXX
