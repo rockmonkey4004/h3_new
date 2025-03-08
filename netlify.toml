@@ -11,8 +11,6 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  [plugins.inputs]
-    includeFiles = ["public/**"]
 
 # Redirect old Jekyll URLs to new Next.js URLs
 [[redirects]]
