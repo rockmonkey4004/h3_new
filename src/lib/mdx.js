@@ -25,85 +25,173 @@ export function getAllPostSlugs() {
  * Get post data by slug
  */
 export function getPostBySlug(slug) {
-  const fullPath = path.join(postsDirectory, `${slug}.md`);
-  const fileContents = fs.readFileSync(fullPath, 'utf8');
-  const { data, content } = matter(fileContents);
+  try {
+    // Ensure slug is a string
+    if (!slug || typeof slug !== 'string') {
+      throw new Error('Invalid slug provided');
+    }
+    
+    const fullPath = path.join(postsDirectory, `${slug}.md`);
+    
+    // Check if file exists
+    if (!fs.existsSync(fullPath)) {
+      throw new Error(`File not found: ${fullPath}`);
+    }
+    
+    const fileContents = fs.readFileSync(fullPath, 'utf8');
+    
+    if (!fileContents) {
+      throw new Error(`Empty file contents for ${fullPath}`);
+    }
+    
+    const { data, content } = matter(fileContents);
 
-  // Parse Jekyll date format from slug (e.g., 2021-03-12-title)
-  const dateMatch = slug.match(/^(\d{4}-\d{2}-\d{2})/);
-  const date = dateMatch ? dateMatch[1] : data.date || '';
-  
-  // Format the date
-  const formattedDate = date ? format(new Date(date), 'MMMM d, yyyy') : '';
+    // Parse Jekyll date format from slug (e.g., 2021-03-12-title)
+    const dateMatch = slug.match(/^(\d{4}-\d{2}-\d{2})/);
+    const date = dateMatch ? dateMatch[1] : data.date || '';
+    
+    // Format the date
+    let formattedDate = '';
+    if (date) {
+      try {
+        formattedDate = format(new Date(date), 'MMMM d, yyyy');
+      } catch (e) {
+        console.error(`Error formatting date ${date}:`, e);
+        formattedDate = date; // Fallback to original date string
+      }
+    }
 
-  return {
-    slug,
-    frontmatter: {
-      ...data,
-      date: formattedDate
-    },
-    content
-  };
+    return {
+      slug,
+      frontmatter: {
+        ...data,
+        date: formattedDate
+      },
+      content
+    };
+  } catch (error) {
+    console.error(`Error getting post by slug ${slug}:`, error);
+    // Return a minimal valid post object rather than throwing
+    return {
+      slug,
+      frontmatter: {
+        title: `Error loading post: ${slug}`,
+        date: '',
+      },
+      content: ''
+    };
+  }
 }
 
 /**
  * Get all posts with frontmatter
  */
 export function getAllPosts() {
-  const fileNames = fs.readdirSync(postsDirectory);
-  const allPostsData = fileNames.map(fileName => {
-    const slug = fileName.replace(/\.md$/, '');
-    return getPostBySlug(slug);
-  });
-
-  // Sort posts by date
-  return allPostsData.sort((a, b) => {
-    if (a.frontmatter.date < b.frontmatter.date) {
-      return 1;
-    } else {
-      return -1;
+  try {
+    // Get all post files
+    const fileNames = fs.readdirSync(postsDirectory);
+    
+    if (!Array.isArray(fileNames) || fileNames.length === 0) {
+      return [];
     }
-  });
+    
+    const allPostsData = fileNames.map(fileName => {
+      try {
+        const slug = fileName.replace(/\.md$/, '');
+        return getPostBySlug(slug);
+      } catch (err) {
+        console.error(`Error processing post ${fileName}:`, err);
+        return null;
+      }
+    }).filter(Boolean); // Remove any null posts
+
+    // Sort posts by date
+    return allPostsData.sort((a, b) => {
+      if (!a || !a.frontmatter || !a.frontmatter.date) return 1;
+      if (!b || !b.frontmatter || !b.frontmatter.date) return -1;
+      
+      if (a.frontmatter.date < b.frontmatter.date) {
+        return 1;
+      } else {
+        return -1;
+      }
+    });
+  } catch (error) {
+    console.error('Error getting all posts:', error);
+    return []; // Return empty array on error
+  }
 }
 
 /**
  * Get posts by tag
  */
 export function getPostsByTag(tag) {
-  const allPosts = getAllPosts();
-  return allPosts.filter(post => {
-    const tags = post.frontmatter.tags || [];
-    
-    // Handle both array and string formats for tags
-    if (Array.isArray(tags)) {
-      return tags.includes(tag);
-    } else if (typeof tags === 'string') {
-      return tags === tag;
+  try {
+    // Ensure tag is a valid string
+    if (!tag || typeof tag !== 'string') {
+      return [];
     }
-    return false;
-  });
+    
+    const allPosts = getAllPosts();
+    
+    // Ensure allPosts is an array
+    const postsArray = Array.isArray(allPosts) ? allPosts : [];
+    
+    return postsArray.filter(post => {
+      // Skip invalid posts
+      if (!post || !post.frontmatter) return false;
+      
+      const tags = post.frontmatter.tags || [];
+      
+      // Handle both array and string formats for tags
+      if (Array.isArray(tags)) {
+        return tags.some(t => t && typeof t === 'string' && t === tag);
+      } else if (typeof tags === 'string') {
+        return tags === tag;
+      }
+      return false;
+    });
+  } catch (error) {
+    console.error(`Error getting posts by tag ${tag}:`, error);
+    return []; // Return empty array on error
+  }
 }
 
 /**
  * Get all unique tags
  */
 export function getAllTags() {
-  const allPosts = getAllPosts();
-  const tagSet = new Set();
-
-  allPosts.forEach(post => {
-    const tags = post.frontmatter.tags || [];
+  try {
+    const allPosts = getAllPosts();
     
-    // Handle both array and string formats for tags
-    if (Array.isArray(tags)) {
-      tags.forEach(tag => tagSet.add(tag));
-    } else if (typeof tags === 'string') {
-      // If tags is a string, add it directly
-      tagSet.add(tags);
-    }
-  });
+    // Ensure allPosts is an array
+    const postsArray = Array.isArray(allPosts) ? allPosts : [];
+    
+    const tagSet = new Set();
 
-  return Array.from(tagSet);
+    postsArray.forEach(post => {
+      if (!post || !post.frontmatter) return;
+      
+      const tags = post.frontmatter.tags || [];
+      
+      // Handle both array and string formats for tags
+      if (Array.isArray(tags)) {
+        tags.forEach(tag => {
+          if (tag && typeof tag === 'string') {
+            tagSet.add(tag);
+          }
+        });
+      } else if (typeof tags === 'string' && tags.trim() !== '') {
+        // If tags is a non-empty string, add it directly
+        tagSet.add(tags);
+      }
+    });
+
+    return Array.from(tagSet);
+  } catch (error) {
+    console.error('Error getting all tags:', error);
+    return []; // Return empty array on error
+  }
 }
 
 /**
