@@ -1,0 +1,27 @@
+[build]
+  command = "npm ci && npm run build"
+  publish = ".next"
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF ./package-lock.json"
+
+[build.environment]
+  NODE_VERSION = "18.17.0"
+  NPM_VERSION = "9.6.7"
+  CI = "true"
+  NEXT_TELEMETRY_DISABLED = "1"
+  PYTHON_VERSION = "3.12.2"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Redirect old Jekyll URLs to new Next.js URLs
+[[redirects]]
+  from = "/tag/:tag"
+  to = "/topics/:tag"
+  status = 301
+  force = true
+
+# Handle 404s
+[[redirects]]
+  from = "/*"
+  to = "/404"
+  status = 404 
