@@ -73,7 +73,14 @@ export function getPostsByTag(tag) {
   const allPosts = getAllPosts();
   return allPosts.filter(post => {
     const tags = post.frontmatter.tags || [];
-    return tags.includes(tag);
+    
+    // Handle both array and string formats for tags
+    if (Array.isArray(tags)) {
+      return tags.includes(tag);
+    } else if (typeof tags === 'string') {
+      return tags === tag;
+    }
+    return false;
   });
 }
 
@@ -86,7 +93,14 @@ export function getAllTags() {
 
   allPosts.forEach(post => {
     const tags = post.frontmatter.tags || [];
-    tags.forEach(tag => tagSet.add(tag));
+    
+    // Handle both array and string formats for tags
+    if (Array.isArray(tags)) {
+      tags.forEach(tag => tagSet.add(tag));
+    } else if (typeof tags === 'string') {
+      // If tags is a string, add it directly
+      tagSet.add(tags);
+    }
   });
 
   return Array.from(tagSet);
