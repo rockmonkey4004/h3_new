@@ -167,7 +167,8 @@ export function getAllTags() {
     // Ensure allPosts is an array
     const postsArray = Array.isArray(allPosts) ? allPosts : [];
     
-    const tagSet = new Set();
+    // Use a standard array instead of a Set for cleaner serialization
+    const uniqueTags = [];
 
     postsArray.forEach(post => {
       if (!post || !post.frontmatter) return;
@@ -177,17 +178,20 @@ export function getAllTags() {
       // Handle both array and string formats for tags
       if (Array.isArray(tags)) {
         tags.forEach(tag => {
-          if (tag && typeof tag === 'string') {
-            tagSet.add(tag);
+          if (tag && typeof tag === 'string' && !uniqueTags.includes(tag)) {
+            uniqueTags.push(tag);
           }
         });
       } else if (typeof tags === 'string' && tags.trim() !== '') {
-        // If tags is a non-empty string, add it directly
-        tagSet.add(tags);
+        // If tags is a non-empty string, add it directly if not already included
+        if (!uniqueTags.includes(tags)) {
+          uniqueTags.push(tags);
+        }
       }
     });
 
-    return Array.from(tagSet);
+    // Return a clean array of strings only
+    return uniqueTags;
   } catch (error) {
     console.error('Error getting all tags:', error);
     return []; // Return empty array on error
