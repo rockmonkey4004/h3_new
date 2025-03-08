@@ -2,26 +2,31 @@ import Head from 'next/head';
 import { useState } from 'react';
 import PostCard from '../../components/blog/PostCard';
 import { getAllPosts } from '../../lib/mdx';
+import { sanitizeData, ensureArray } from '../../lib/utils';
 
 export default function RecipesPage({ posts = [] }) {
   const [searchTerm, setSearchTerm] = useState('');
   
-  // Ensure posts is an array before filtering
+  // Use safe array check with empty default
   const postsArray = Array.isArray(posts) ? posts : [];
   
-  // Filter posts based on search term
+  // Filter posts safely based on search term
   const filteredPosts = postsArray.filter(post => {
-    const { title = '', description = '', tags } = post.frontmatter || {};
+    if (!post || !post.frontmatter) return false;
     
-    // Handle tags that might be a string or an array
-    let tagsString = '';
+    const title = post.frontmatter.title || '';
+    const description = post.frontmatter.description || '';
+    const tags = post.frontmatter.tags || [];
+    
+    // Handle different tag formats
+    let tagString = '';
     if (Array.isArray(tags)) {
-      tagsString = tags.join(' ');
+      tagString = tags.join(' ');
     } else if (typeof tags === 'string') {
-      tagsString = tags;
+      tagString = tags;
     }
     
-    const searchContent = `${title} ${description} ${tagsString}`.toLowerCase();
+    const searchContent = `${title} ${description} ${tagString}`.toLowerCase();
     return searchContent.includes(searchTerm.toLowerCase());
   });
 
@@ -52,8 +57,8 @@ export default function RecipesPage({ posts = [] }) {
 
         {filteredPosts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredPosts.map((post) => (
-              <PostCard key={post.slug} post={post} />
+            {filteredPosts.map((post, index) => (
+              <PostCard key={`post-${index}-${post.slug || ''}`} post={post} />
             ))}
           </div>
         ) : (
@@ -70,34 +75,52 @@ export default function RecipesPage({ posts = [] }) {
 }
 
 export async function getStaticProps() {
-  const allPosts = getAllPosts();
-  
-  // Ensure allPosts is an array
-  const postsArray = Array.isArray(allPosts) ? allPosts : [];
-  
-  const posts = postsArray.filter(post => {
-    if (!post || !post.frontmatter) return false;
+  try {
+    console.log("Starting getStaticProps for recipes page");
     
-    // Handle categories that might be strings or arrays
-    const categories = post.frontmatter.categories || [];
-    const categoriesArray = Array.isArray(categories) ? categories : 
-                           (typeof categories === 'string' ? [categories] : []);
+    // Get all posts
+    const allPosts = getAllPosts();
     
-    // Handle tags that might be strings or arrays
-    const tags = post.frontmatter.tags || [];
-    const tagsArray = Array.isArray(tags) ? tags : 
-                     (typeof tags === 'string' ? [tags] : []);
+    // Ensure it's an array
+    const postsArray = ensureArray(allPosts);
     
-    const title = post.frontmatter.title || '';
+    // Filter for recipe posts
+    const recipePosts = [];
     
-    return categoriesArray.includes('recipe') || categoriesArray.includes('recipes') || 
-           tagsArray.includes('recipes') || tagsArray.includes('paleo') || 
-           title.toLowerCase().includes('recipe');
-  });
-
-  return {
-    props: {
-      posts,
-    },
-  };
+    for (let i = 0; i < postsArray.length; i++) {
+      const post = postsArray[i];
+      if (!post || !post.frontmatter) continue;
+      
+      const categories = ensureArray(post.frontmatter.categories);
+      const tags = ensureArray(post.frontmatter.tags);
+      const title = post.frontmatter.title || '';
+      
+      // Check if this is a recipe post
+      const isRecipe = 
+        categories.includes('recipe') || 
+        categories.includes('recipes') || 
+        tags.includes('recipes') || 
+        tags.includes('paleo') || 
+        title.toLowerCase().includes('recipe');
+      
+      if (isRecipe) {
+        recipePosts.push(sanitizeData(post));
+      }
+    }
+    
+    console.log(`Found ${recipePosts.length} recipe posts`);
+    
+    return {
+      props: {
+        posts: recipePosts
+      }
+    };
+  } catch (error) {
+    console.error("Error in recipes getStaticProps:", error);
+    return {
+      props: {
+        posts: []
+      }
+    };
+  }
 } 

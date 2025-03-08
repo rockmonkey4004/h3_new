@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { format } from 'date-fns';
+import { sanitizeData, ensureArray } from './utils';
 
 // Path to our content
 const postsDirectory = path.join(process.cwd(), '_posts');
@@ -127,33 +128,60 @@ export function getAllPosts() {
  */
 export function getPostsByTag(tag) {
   try {
+    console.log(`Starting getPostsByTag for tag: "${tag}"`);
+    
     // Ensure tag is a valid string
     if (!tag || typeof tag !== 'string') {
+      console.warn('Invalid tag provided to getPostsByTag');
       return [];
     }
     
+    // Get all posts
     const allPosts = getAllPosts();
     
-    // Ensure allPosts is an array
-    const postsArray = Array.isArray(allPosts) ? allPosts : [];
+    // Ensure posts is an array
+    const postsArray = ensureArray(allPosts);
+    console.log(`Processing ${postsArray.length} posts to find tag: "${tag}"`);
     
-    return postsArray.filter(post => {
+    // Match posts with the given tag
+    const result = [];
+    
+    // Use traditional for loop for maximum compatibility
+    for (let i = 0; i < postsArray.length; i++) {
+      const post = postsArray[i];
+      
       // Skip invalid posts
-      if (!post || !post.frontmatter) return false;
-      
-      const tags = post.frontmatter.tags || [];
-      
-      // Handle both array and string formats for tags
-      if (Array.isArray(tags)) {
-        return tags.some(t => t && typeof t === 'string' && t === tag);
-      } else if (typeof tags === 'string') {
-        return tags === tag;
+      if (!post || !post.frontmatter) {
+        continue;
       }
-      return false;
-    });
+      
+      const postTags = post.frontmatter.tags;
+      let matchFound = false;
+      
+      // Check array of tags
+      if (Array.isArray(postTags)) {
+        for (let j = 0; j < postTags.length; j++) {
+          if (postTags[j] === tag) {
+            matchFound = true;
+            break;
+          }
+        }
+      } 
+      // Check string tag
+      else if (typeof postTags === 'string' && postTags === tag) {
+        matchFound = true;
+      }
+      
+      if (matchFound) {
+        result.push(sanitizeData(post));
+      }
+    }
+    
+    console.log(`Found ${result.length} posts with tag: "${tag}"`);
+    return result;
   } catch (error) {
-    console.error(`Error getting posts by tag ${tag}:`, error);
-    return []; // Return empty array on error
+    console.error(`Error in getPostsByTag for tag "${tag}":`, error);
+    return [];
   }
 }
 
@@ -162,39 +190,49 @@ export function getPostsByTag(tag) {
  */
 export function getAllTags() {
   try {
+    console.log("Starting getAllTags function");
+    
+    // Get all posts
     const allPosts = getAllPosts();
+    console.log(`Retrieved ${allPosts ? (Array.isArray(allPosts) ? allPosts.length : 'non-array') : 'null'} posts in getAllTags`);
     
-    // Ensure allPosts is an array
-    const postsArray = Array.isArray(allPosts) ? allPosts : [];
+    // Ensure it's an array
+    const postsArray = ensureArray(allPosts);
     
-    // Use a standard array instead of a Set for cleaner serialization
-    const uniqueTags = [];
-
-    postsArray.forEach(post => {
-      if (!post || !post.frontmatter) return;
+    // Standard array to collect tags
+    const allTagsList = [];
+    
+    // Collect all tags from posts
+    for (let i = 0; i < postsArray.length; i++) {
+      const post = postsArray[i];
+      if (!post || !post.frontmatter) continue;
       
-      const tags = post.frontmatter.tags || [];
+      const tags = post.frontmatter.tags;
       
-      // Handle both array and string formats for tags
+      // Handle tags as array
       if (Array.isArray(tags)) {
-        tags.forEach(tag => {
-          if (tag && typeof tag === 'string' && !uniqueTags.includes(tag)) {
-            uniqueTags.push(tag);
+        for (let j = 0; j < tags.length; j++) {
+          const tag = tags[j];
+          if (tag && typeof tag === 'string' && tag.trim() !== '') {
+            allTagsList.push(tag.trim());
           }
-        });
-      } else if (typeof tags === 'string' && tags.trim() !== '') {
-        // If tags is a non-empty string, add it directly if not already included
-        if (!uniqueTags.includes(tags)) {
-          uniqueTags.push(tags);
         }
+      } 
+      // Handle tags as string
+      else if (tags && typeof tags === 'string' && tags.trim() !== '') {
+        allTagsList.push(tags.trim());
       }
-    });
-
-    // Return a clean array of strings only
-    return uniqueTags;
+    }
+    
+    // Create a unique array of tags
+    const uniqueTags = [...new Set(allTagsList)];
+    console.log(`Found ${uniqueTags.length} unique tags`);
+    
+    // Return sanitized data
+    return sanitizeData(uniqueTags);
   } catch (error) {
-    console.error('Error getting all tags:', error);
-    return []; // Return empty array on error
+    console.error('Error in getAllTags:', error);
+    return [];
   }
 }
 

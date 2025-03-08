@@ -2,6 +2,7 @@ import Head from 'next/head';
 import PostCard from '../../components/blog/PostCard';
 import { getAllTags, getPostsByTag } from '../../lib/mdx';
 import { useMemo } from 'react';
+import { sanitizeData, ensureArray } from '../../lib/utils';
 
 export default function TopicPage({ tag = '', posts = [] }) {
   // Convert tag to string and sanitize
@@ -95,53 +96,38 @@ export default function TopicPage({ tag = '', posts = [] }) {
 
 export async function getStaticPaths() {
   try {
-    // Try to get tags, but handle any potential errors
-    const rawTags = getAllTags();
+    console.log("Starting getStaticPaths for topics/[tag]");
+    let rawTags = getAllTags();
+    console.log(`Raw tags retrieved: ${JSON.stringify(rawTags)}`);
     
-    // Force conversion to array and ensure each item is a string
-    // This explicit JSON parsing/stringifying forces a clean array data structure
-    let tagsArray = [];
+    // Convert tags to a clean array of strings
+    const tags = ensureArray(rawTags).filter(tag => 
+      tag !== null && tag !== undefined && String(tag).trim() !== ''
+    ).map(tag => String(tag));
     
-    try {
-      // Attempt to clean the data by JSON serialization/deserialization
-      if (rawTags) {
-        const cleanJson = JSON.stringify(rawTags);
-        const parsed = JSON.parse(cleanJson);
-        if (Array.isArray(parsed)) {
-          tagsArray = parsed.filter(tag => tag && typeof tag === 'string');
-        }
-      }
-    } catch (jsonError) {
-      console.warn('Error cleaning tags data:', jsonError);
-      // Fallback to manual filtering if JSON method fails
-      if (Array.isArray(rawTags)) {
-        tagsArray = rawTags.filter(tag => tag && typeof tag === 'string');
-      } else if (rawTags && typeof rawTags === 'string') {
-        tagsArray = [rawTags];
-      }
-    }
+    console.log(`Sanitized tags: ${JSON.stringify(tags)}`);
     
-    // Create an explicitly formatted paths array with stringified params
+    // Create explicitly formatted paths array
     const paths = [];
     
-    // Use a for loop instead of map to avoid any potential array method issues
-    for (let i = 0; i < tagsArray.length; i++) {
-      const tagStr = String(tagsArray[i] || '').trim();
-      if (tagStr) {
-        paths.push({
-          params: { tag: tagStr }
-        });
-      }
+    // Use traditional for loop instead of map to avoid any issues
+    for (let i = 0; i < tags.length; i++) {
+      paths.push({
+        params: { tag: tags[i] }
+      });
     }
     
-    console.log(`Generated ${paths.length} static paths for tags`);
-    
-    return {
-      paths: paths,
+    // Sanitize the paths object before returning
+    const sanitizedResult = {
+      paths: sanitizeData(paths),
       fallback: false
     };
+    
+    console.log(`Generated ${sanitizedResult.paths.length} static paths for tags`);
+    
+    return sanitizedResult;
   } catch (error) {
-    console.error('Error generating static paths:', error);
+    console.error('Error in getStaticPaths for [tag].js:', error);
     return {
       paths: [],
       fallback: false
@@ -151,67 +137,46 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   try {
-    // Safely extract the tag parameter, ensure it's a string
-    const tag = params && params.tag ? String(params.tag) : '';
+    console.log(`Starting getStaticProps for tag: ${JSON.stringify(params)}`);
     
-    // Only proceed if we have a valid tag
-    if (!tag || tag.trim() === '') {
-      console.warn('Empty or invalid tag parameter received');
+    // Get the tag parameter
+    const tag = params?.tag ? String(params.tag) : '';
+    
+    if (!tag) {
+      console.warn('Empty tag parameter in getStaticProps');
       return {
-        props: {
+        props: sanitizeData({
           tag: '',
-          posts: [],
-        },
+          posts: []
+        })
       };
     }
     
     // Get posts for this tag
-    const rawPosts = getPostsByTag(tag);
+    let rawPosts = getPostsByTag(tag);
+    console.log(`Retrieved ${rawPosts ? (Array.isArray(rawPosts) ? rawPosts.length : 'non-array') : 'null'} raw posts for tag "${tag}"`);
     
-    // Clean the data structure by forcing serialization/deserialization
-    let cleanPosts = [];
+    // Convert to a clean array and filter invalid posts
+    const posts = ensureArray(rawPosts).filter(post => 
+      post && typeof post === 'object' && post.slug
+    );
     
-    try {
-      // Attempt to clean the data through JSON
-      const postsJson = JSON.stringify(rawPosts);
-      const parsedPosts = JSON.parse(postsJson);
-      
-      if (Array.isArray(parsedPosts)) {
-        cleanPosts = parsedPosts.filter(post => 
-          post && 
-          typeof post === 'object' && 
-          post.slug && 
-          post.frontmatter
-        );
-      }
-    } catch (jsonError) {
-      console.warn('Error cleaning posts data:', jsonError);
-      // Fall back to manual filtering
-      if (Array.isArray(rawPosts)) {
-        cleanPosts = rawPosts.filter(post => 
-          post && 
-          typeof post === 'object' && 
-          post.slug && 
-          post.frontmatter
-        );
-      }
-    }
+    console.log(`Sanitized to ${posts.length} valid posts for tag "${tag}"`);
     
-    console.log(`Found ${cleanPosts.length} posts for tag "${tag}"`);
+    // Create a clean props object with sanitized data
+    const props = sanitizeData({
+      tag,
+      posts
+    });
     
-    return {
-      props: {
-        tag,
-        posts: cleanPosts,
-      },
-    };
+    return { props };
   } catch (error) {
-    console.error(`Error getting static props for tag ${params?.tag}:`, error);
+    console.error(`Error in getStaticProps for tag ${JSON.stringify(params)}:`, error);
     return {
-      props: {
+      props: sanitizeData({
         tag: params?.tag ? String(params.tag) : '',
-        posts: [],
-      },
+        posts: []
+      })
     };
   }
 } 
