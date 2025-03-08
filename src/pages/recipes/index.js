@@ -2,28 +2,27 @@ import Head from 'next/head';
 import { useState } from 'react';
 import PostCard from '../../components/blog/PostCard';
 import { getAllPosts } from '../../lib/mdx';
-import { sanitizeData, ensureArray } from '../../lib/utils';
 
-export default function RecipesPage({ posts = [] }) {
+// Simple component with minimal complexity
+export default function RecipesPage({ posts }) {
   const [searchTerm, setSearchTerm] = useState('');
   
-  // Use safe array check with empty default
+  // Ensure posts is an array
   const postsArray = Array.isArray(posts) ? posts : [];
   
-  // Filter posts safely based on search term
+  // Basic filter implementation
   const filteredPosts = postsArray.filter(post => {
     if (!post || !post.frontmatter) return false;
     
     const title = post.frontmatter.title || '';
     const description = post.frontmatter.description || '';
-    const tags = post.frontmatter.tags || [];
     
-    // Handle different tag formats
+    // Simple tag handling
     let tagString = '';
-    if (Array.isArray(tags)) {
-      tagString = tags.join(' ');
-    } else if (typeof tags === 'string') {
-      tagString = tags;
+    if (Array.isArray(post.frontmatter.tags)) {
+      tagString = post.frontmatter.tags.join(' ');
+    } else if (typeof post.frontmatter.tags === 'string') {
+      tagString = post.frontmatter.tags;
     }
     
     const searchContent = `${title} ${description} ${tagString}`.toLowerCase();
@@ -58,7 +57,7 @@ export default function RecipesPage({ posts = [] }) {
         {filteredPosts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPosts.map((post, index) => (
-              <PostCard key={`post-${index}-${post.slug || ''}`} post={post} />
+              <PostCard key={index} post={post} />
             ))}
           </div>
         ) : (
@@ -74,41 +73,44 @@ export default function RecipesPage({ posts = [] }) {
   );
 }
 
+// Simple implementation with minimal data processing
 export async function getStaticProps() {
   try {
-    console.log("Starting getStaticProps for recipes page");
-    
-    // Get all posts
     const allPosts = getAllPosts();
     
     // Ensure it's an array
-    const postsArray = ensureArray(allPosts);
+    const postsArray = Array.isArray(allPosts) ? allPosts : [];
     
-    // Filter for recipe posts
+    // Filter for recipe posts with minimal processing
     const recipePosts = [];
     
     for (let i = 0; i < postsArray.length; i++) {
       const post = postsArray[i];
       if (!post || !post.frontmatter) continue;
       
-      const categories = ensureArray(post.frontmatter.categories);
-      const tags = ensureArray(post.frontmatter.tags);
-      const title = post.frontmatter.title || '';
-      
-      // Check if this is a recipe post
+      // Simple check for recipe-related content
       const isRecipe = 
-        categories.includes('recipe') || 
-        categories.includes('recipes') || 
-        tags.includes('recipes') || 
-        tags.includes('paleo') || 
-        title.toLowerCase().includes('recipe');
+        (post.frontmatter.categories && String(post.frontmatter.categories).includes('recipe')) ||
+        (post.frontmatter.tags && String(post.frontmatter.tags).includes('recipe')) ||
+        (post.frontmatter.tags && String(post.frontmatter.tags).includes('paleo')) ||
+        (post.frontmatter.title && post.frontmatter.title.toLowerCase().includes('recipe'));
       
       if (isRecipe) {
-        recipePosts.push(sanitizeData(post));
+        // Create a simple clean object
+        recipePosts.push({
+          slug: post.slug,
+          frontmatter: {
+            title: post.frontmatter.title || '',
+            date: post.frontmatter.date || '',
+            description: post.frontmatter.description || '',
+            featured_image: post.frontmatter.featured_image || '',
+            alt: post.frontmatter.alt || '',
+            tags: post.frontmatter.tags || []
+          },
+          content: post.content
+        });
       }
     }
-    
-    console.log(`Found ${recipePosts.length} recipe posts`);
     
     return {
       props: {
