@@ -1,17 +1,53 @@
 import Head from 'next/head';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PostCard from '../../components/blog/PostCard';
 import { getAllPosts } from '../../lib/mdx';
 
-// Simple component with minimal complexity
-export default function RecipesPage({ posts }) {
+// Component with client-side data loading
+export default function RecipesPage() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
   
-  // Ensure posts is an array
-  const postsArray = Array.isArray(posts) ? posts : [];
+  // Load data client-side
+  useEffect(() => {
+    const loadRecipes = () => {
+      try {
+        // Get all posts
+        const allPosts = getAllPosts();
+        if (!Array.isArray(allPosts)) {
+          setPosts([]);
+          setLoading(false);
+          return;
+        }
+        
+        // Filter for recipe posts
+        const recipes = allPosts.filter(post => {
+          if (!post || !post.frontmatter) return false;
+          
+          // Simple check for recipe-related content
+          return (
+            (post.frontmatter.categories && String(post.frontmatter.categories).includes('recipe')) ||
+            (post.frontmatter.tags && String(post.frontmatter.tags).includes('recipe')) ||
+            (post.frontmatter.tags && String(post.frontmatter.tags).includes('paleo')) ||
+            (post.frontmatter.title && post.frontmatter.title.toLowerCase().includes('recipe'))
+          );
+        });
+        
+        setPosts(recipes);
+      } catch (error) {
+        console.error('Error loading recipes:', error);
+        setPosts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadRecipes();
+  }, []);
   
-  // Basic filter implementation
-  const filteredPosts = postsArray.filter(post => {
+  // Filter posts based on search term
+  const filteredPosts = posts.filter(post => {
     if (!post || !post.frontmatter) return false;
     
     const title = post.frontmatter.title || '';
@@ -28,6 +64,16 @@ export default function RecipesPage({ posts }) {
     const searchContent = `${title} ${description} ${tagString}`.toLowerCase();
     return searchContent.includes(searchTerm.toLowerCase());
   });
+  
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="container-narrow py-12 text-center">
+        <h1 className="text-4xl font-bold mb-8">Loading Recipes...</h1>
+        <p>Finding the perfect recipes for you</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -71,58 +117,4 @@ export default function RecipesPage({ posts }) {
       </div>
     </>
   );
-}
-
-// Simple implementation with minimal data processing
-export async function getStaticProps() {
-  try {
-    const allPosts = getAllPosts();
-    
-    // Ensure it's an array
-    const postsArray = Array.isArray(allPosts) ? allPosts : [];
-    
-    // Filter for recipe posts with minimal processing
-    const recipePosts = [];
-    
-    for (let i = 0; i < postsArray.length; i++) {
-      const post = postsArray[i];
-      if (!post || !post.frontmatter) continue;
-      
-      // Simple check for recipe-related content
-      const isRecipe = 
-        (post.frontmatter.categories && String(post.frontmatter.categories).includes('recipe')) ||
-        (post.frontmatter.tags && String(post.frontmatter.tags).includes('recipe')) ||
-        (post.frontmatter.tags && String(post.frontmatter.tags).includes('paleo')) ||
-        (post.frontmatter.title && post.frontmatter.title.toLowerCase().includes('recipe'));
-      
-      if (isRecipe) {
-        // Create a simple clean object
-        recipePosts.push({
-          slug: post.slug,
-          frontmatter: {
-            title: post.frontmatter.title || '',
-            date: post.frontmatter.date || '',
-            description: post.frontmatter.description || '',
-            featured_image: post.frontmatter.featured_image || '',
-            alt: post.frontmatter.alt || '',
-            tags: post.frontmatter.tags || []
-          },
-          content: post.content
-        });
-      }
-    }
-    
-    return {
-      props: {
-        posts: recipePosts
-      }
-    };
-  } catch (error) {
-    console.error("Error in recipes getStaticProps:", error);
-    return {
-      props: {
-        posts: []
-      }
-    };
-  }
 } 

@@ -1,11 +1,66 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import { getAllTags } from '../../lib/mdx';
+import { useState, useEffect } from 'react';
+import { getAllPosts } from '../../lib/mdx';
 
-export default function TopicsPage({ tags = [] }) {
-  // Ensure tags is an array
-  const tagsArray = Array.isArray(tags) ? tags : [];
+// Component with client-side data loading
+export default function TopicsPage() {
+  const [tags, setTags] = useState([]);
+  const [loading, setLoading] = useState(true);
   
+  // Load data client-side
+  useEffect(() => {
+    const loadTags = () => {
+      try {
+        // Get all posts
+        const allPosts = getAllPosts();
+        if (!Array.isArray(allPosts)) {
+          setTags([]);
+          setLoading(false);
+          return;
+        }
+        
+        // Extract tags manually
+        const tagsSet = new Set();
+        
+        allPosts.forEach(post => {
+          if (post && post.frontmatter && post.frontmatter.tags) {
+            if (Array.isArray(post.frontmatter.tags)) {
+              post.frontmatter.tags.forEach(tag => {
+                if (tag && typeof tag === 'string' && tag.trim() !== '') {
+                  tagsSet.add(tag.trim());
+                }
+              });
+            } else if (typeof post.frontmatter.tags === 'string' && post.frontmatter.tags.trim() !== '') {
+              tagsSet.add(post.frontmatter.tags.trim());
+            }
+          }
+        });
+        
+        // Convert to array and sort
+        const tagsList = Array.from(tagsSet).sort();
+        setTags(tagsList);
+      } catch (error) {
+        console.error('Error loading tags:', error);
+        setTags([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadTags();
+  }, []);
+  
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="container-narrow py-12 text-center">
+        <h1 className="text-4xl font-bold mb-8">Loading Topics...</h1>
+        <p>Organizing all available topics</p>
+      </div>
+    );
+  }
+
   return (
     <>
       <Head>
@@ -20,11 +75,11 @@ export default function TopicsPage({ tags = [] }) {
           Browse all topics to find exactly what you're looking for
         </p>
         
-        {tagsArray.length > 0 ? (
+        {tags.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {tagsArray.map((tag) => (
+            {tags.map((tag, index) => (
               <Link
-                key={tag}
+                key={index}
                 href={`/topics/${tag}`}
                 className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow text-center"
               >
@@ -34,25 +89,13 @@ export default function TopicsPage({ tags = [] }) {
           </div>
         ) : (
           <div className="text-center py-12">
+            <h2 className="text-2xl font-semibold mb-4">No topics found</h2>
             <p className="text-gray-600">
-              No topics found. Check back later!
+              Check back later for topics!
             </p>
           </div>
         )}
       </div>
     </>
   );
-}
-
-export async function getStaticProps() {
-  const tags = getAllTags();
-  
-  // Ensure tags is an array
-  const tagsArray = Array.isArray(tags) ? tags : [];
-  
-  return {
-    props: {
-      tags: tagsArray,
-    },
-  };
 } 
