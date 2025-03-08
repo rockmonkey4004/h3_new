@@ -1,0 +1,19 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Redirect old Jekyll URLs to new Next.js URLs
+[[redirects]]
+  from = "/tag/:tag"
+  to = "/topics/:tag"
+  status = 301
+  force = true
+
+# Handle 404s
+[[redirects]]
+  from = "/*"
+  to = "/404"
+  status = 404 
